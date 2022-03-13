@@ -1,4 +1,5 @@
 import paramiko as p
+import yaml
 #from subprocess import stdout
 
 def send_command(host, username, password): 
@@ -11,10 +12,19 @@ def send_command(host, username, password):
    print(resp)
    ssh.close()
 
+def get_config(config):
+    print("Getting SSH credential...")
+    _config = yaml.load(config)
+    for key, value in _config.items(): 
+        print(key + "  " + str(value))
+
+
 
 def main():
     #   This is main 
-    send_command()
+    config_file = open("../ssh_config.yaml",'r')
+    get_config(config_file)
+    #send_command()
     print("Just a print for now")
 
 if __name__ == "__main__":
