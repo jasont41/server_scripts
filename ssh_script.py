@@ -1,7 +1,11 @@
 import paramiko as p
 import yaml
-#from subprocess import stdout
+import sys 
 
+##############################################################
+#   Description: Sends bash command to machine via ssh 
+#   Returns:     Nothing 
+##############################################################
 def send_command(host, username, password): 
    ssh = p.SSHClient() 
    ssh.set_missing_host_key_policy(p.AutoAddPolicy())
@@ -12,6 +16,11 @@ def send_command(host, username, password):
    print(resp)
    ssh.close()
 
+
+##############################################################
+#   Description: Retrieves credentials from yaml file  
+#   Returns:     Nothing 
+############################################################## 
 def get_config(config):
     print("Getting SSH credential...")
     _config = yaml.load(config)
@@ -20,12 +29,14 @@ def get_config(config):
 
 
 
-def main():
-    #   This is main 
+def main(argv):
+    if len(sys.argv) > 2:
+        print("Too many arguments")
+        sys.exit()
     config_file = open("../ssh_config.yaml",'r')
     get_config(config_file)
     #send_command()
     print("Just a print for now")
 
 if __name__ == "__main__":
-    main()
+    main(sys.argv)
