@@ -1,6 +1,19 @@
+from os import lseek
 import paramiko as p
 import yaml
 import sys 
+
+class ssh_instance: 
+    def __init__(self, incoming_state):
+       ssh_instance.state = incoming_state 
+       ssh_instance.print_state(self)
+    def print_state(self):
+        print(self.state)
+
+
+
+
+
 
 ##############################################################
 #   Description: Sends bash command to machine via ssh 
@@ -30,13 +43,14 @@ def get_config(config):
 
 
 def main(argv):
-    if len(sys.argv) > 2:
-        print("Too many arguments")
-        sys.exit()
-    config_file = open("../ssh_config.yaml",'r')
-    get_config(config_file)
-    #send_command()
-    print("Just a print for now")
+    test = ssh_instance ("test")
+    # if len(sys.argv) > 2:
+    #     print("Too many arguments")
+    #     sys.exit()
+    # config_file = open("../ssh_config.yaml",'r')
+    # get_config(config_file)
+    # #send_command()
+    # print("Just a print for now")
 
 if __name__ == "__main__":
     main(sys.argv)
