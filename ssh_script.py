@@ -13,16 +13,18 @@ class ssh_instance:
         config_file = open("../ssh_config.yaml",'r')
         #   grab config and return into a dictionary 
         yaml_dict = self.get_config(config_file)  
+        self.send_command(yaml_dict['host'], yaml_dict['user'], yaml_dict['password'])
+
     def print_state(self):
         print(self.state)
     '''
     #   Description: Sends bash command to machine via ssh 
     #   Returns:     Nothing 
     '''
-    def send_command(host, username, password): 
+    def send_command(self, host, username, password): 
         ssh = p.SSHClient() 
         ssh.set_missing_host_key_policy(p.AutoAddPolicy())
-        ssh.connect(ip,port,user,password,timeout=5)
+        ssh.connect(host,22,username,password,timeout=5)
         stdin, stdout, stderr = ssh.exec_command("df")
         outline = stdout.readlines()
         resp = ''.join(outline)
@@ -40,15 +42,7 @@ class ssh_instance:
     #   Description: Sends bash command to machine via ssh 
     #   Returns:     Nothing 
     '''
-    def send_command(host, username, password): 
-        ssh = p.SSHClient() 
-        ssh.set_missing_host_key_policy(p.AutoAddPolicy())
-        ssh.connect(ip,port,user,password,timeout=5)
-        stdin, stdout, stderr = ssh.exec_command("df")
-        outline = stdout.readlines()
-        resp = ''.join(outline)
-        print(resp)
-        ssh.close()
+    
     
 
 
