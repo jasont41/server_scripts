@@ -1,4 +1,3 @@
-from asyncore import file_dispatcher
 from genericpath import exists
 from os import lseek
 import paramiko as p
