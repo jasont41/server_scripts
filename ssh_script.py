@@ -1,3 +1,5 @@
+from asyncore import file_dispatcher
+from genericpath import exists
 from os import lseek
 import paramiko as p
 import yaml
@@ -11,6 +13,8 @@ class ssh_instance:
             print("Too many arguments")
             sys.exit()
         config_file = open("../ssh_config.yaml",'r')
+        #   open file for logging 
+        log_file = self.start_log()
         #   grab config and return into a dictionary 
         yaml_dict = self.get_config(config_file)  
         self.send_command(yaml_dict['host'], yaml_dict['user'], yaml_dict['password'])
@@ -39,9 +43,19 @@ class ssh_instance:
         _config = yaml.load(config)
         return _config
     '''
-    #   Description: Sends bash command to machine via ssh 
-    #   Returns:     Nothing 
+    #    Description: Opens file for logging, creates file if file doesn't exist 
+    #    Returns:     File object for logging
     '''
+    def start_log(self): 
+        filepath = "../logging/ssh_script_log.txt"
+        file=''
+        if exists(filepath):
+            print("File exists.. Starting Log. \n")
+            file = open(filepath,"a+")
+        else: 
+            print("File doesn't exist.. Creating file. Starting Log\n")
+            file = open(filepath, "w+")
+        return file 
     
     
 
