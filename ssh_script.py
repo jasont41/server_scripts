@@ -1,3 +1,4 @@
+from asyncio.log import logger
 from asyncore import file_dispatcher
 from genericpath import exists
 from os import lseek
@@ -30,40 +31,31 @@ class ssh_instance:
     #   Returns:     Nothing 
     '''
     def send_command(self, host, username, password): 
-        ssh = p.SSHClient() 
-        ssh.set_missing_host_key_policy(p.AutoAddPolicy())
-        ssh.connect(host,22,username,password,timeout=5)
-        stdin, stdout, stderr = ssh.exec_command("df")
-        outline = stdout.readlines()
-        resp = ''.join(outline)
-        logging.debug(resp)
-        ssh.close()
+        worked = True 
+        try: 
+            ssh = p.SSHClient() 
+            ssh.set_missing_host_key_policy(p.AutoAddPolicy())
+            ssh.connect(host,22,username,password,timeout=5)
+            stdin, stdout, stderr = ssh.exec_command("df")
+            outline = stdout.readlines()
+            resp = ''.join(outline)
+            logging.debug(resp)
+            ssh.close()
+        except: 
+            worked = False
+            logger.warn("Error found, check credentials")
+        if worked: 
+            logger.info("SSH Command sent successfully")
+        
     '''
     #   Description: Retrieves credentials from yaml file  
     #   Returns:     Nothing 
     '''
     def get_config(self, config):
-        print("Getting SSH credential...")
+        logger.info("Getting SSH credentials...")
         _config = yaml.safe_load(config)
         return _config
-    '''
-    #    Description: Opens file for logging, creates file if file doesn't exist 
-    #    Returns:     File object for logging
-    '''
-    def start_log(self): 
-        filepath = "../logging/ssh_script_log.txt"
-        file=''
-        if exists(filepath):
-            print("File exists.. Starting Log. \n")
-            file = open(filepath,"a+")
-        else: 
-            print("File doesn't exist.. Creating file. Starting Log\n")
-            file = open(filepath, "w+")
-        return file 
-    
-    
-
-
+        
 def main(argv):
     test = ssh_instance ("test",argv)
 
