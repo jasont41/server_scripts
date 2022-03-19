@@ -8,24 +8,20 @@ import sys
 import logging 
 
 class ssh_instance: 
-    def __init__(self, incoming_state,argv):
+    def __init__(self, argv):
         logging.basicConfig(filename='../logging/ssh_script.log', format='%(asctime)s %(message)s',level=logging.DEBUG)
         #   To cut down on BS paramiko logs 
         logging.getLogger("paramiko").setLevel(logging.WARNING)
-        ssh_instance.state = incoming_state 
-        ssh_instance.print_state(self)
         if len(sys.argv) > 2:
             logging.debug("Too many arguments")
             sys.exit()
         logging.debug("Opening Config File")
         config_file = open("../ssh_config.yaml",'r')
-        #   open file for logging 
         #   grab config and return into a dictionary 
         yaml_dict = self.get_config(config_file)  
         self.send_command(yaml_dict['host'], yaml_dict['user'], yaml_dict['password'])
 
-    def print_state(self):
-        print(self.state)
+    
     '''
     #   Description: Sends bash command to machine via ssh 
     #   Returns:     Nothing 
@@ -57,7 +53,7 @@ class ssh_instance:
         return _config
         
 def main(argv):
-    test = ssh_instance ("test",argv)
+    test = ssh_instance (argv)
 
 
 if __name__ == "__main__":
