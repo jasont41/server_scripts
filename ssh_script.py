@@ -1,5 +1,6 @@
 from asyncio.log import logger
 from asyncore import file_dispatcher
+from distutils.command.config import config
 from genericpath import exists
 from os import lseek
 import paramiko as p
@@ -8,20 +9,21 @@ import sys
 import logging 
 
 class ssh_instance: 
+    config_file = {}
+    yaml_loc = "../ssh_config.yaml"
     def __init__(self, argv):
         logging.basicConfig(filename='../logging/ssh_script.log', format='%(asctime)s %(message)s',level=logging.DEBUG)
         #   To cut down on BS paramiko logs 
-        logging.getLogger("paramiko").setLevel(logging.WARNING)
-        if len(sys.argv) > 2:
-            logging.debug("Too many arguments")
-            sys.exit()
         logging.debug("Opening Config File")
-        config_file = open("../ssh_config.yaml",'r')
         #   grab config and return into a dictionary 
-        yaml_dict = self.get_config(config_file)  
-        self.send_command(yaml_dict['host'], yaml_dict['user'], yaml_dict['password'])
+        ssh_instance.config_file = self.get_config()
+        # print("printing config file\t\t")
+        # print(ssh_instance.config_file)
+        logging.getLogger("paramiko").setLevel(logging.WARNING)
+        if(len(sys.argv) > 1):
+            self.check_flags(argv)
+        self.send_command(self.config_file['hostname'], self.config_file['username'], self.config_file['password'])
 
-    
     '''
     #   Description: Sends bash command to machine via ssh 
     #   Returns:     Nothing 
@@ -36,6 +38,7 @@ class ssh_instance:
             outline = stdout.readlines()
             resp = ''.join(outline)
             logging.debug(resp)
+            print(resp)
             ssh.close()
         except: 
             worked = False
@@ -47,13 +50,59 @@ class ssh_instance:
     #   Description: Retrieves credentials from yaml file  
     #   Returns:     Nothing 
     '''
-    def get_config(self, config):
+    def get_config(self):
         logger.info("Getting SSH credentials...")
+        config = open(self.yaml_loc,'r')
         _config = yaml.safe_load(config)
+        print(_config)
         return _config
+    '''
+    #   Description: Checks incoming flags and calls respective function 
+    #   Returns:     Nothing 
+    '''
+    def check_flags(self, argv):
+        if sys.argv[1] == "-c":
+            self.change_credentials()
+            return 
+        else: 
+            logging.warn("Invalid flag, Aborting program")
+    '''
+    #   Description: Changes SSH credentials   
+    #   Returns:     Nothing 
+    '''
+    def change_credentials(self):
+        logger.info("Time to change SSH Credentials")
+        username = ""
+        _password = ""
+        while len(username) == 0: 
+            username = input("Enter Username\n")
+            if len(username) == 0: 
+                print("Enter a username!\n")
+        print("\n")
+        while len(_password) == 0: 
+            _password = input("Enter Password\n")
+            if len(_password) == 0: 
+                print("Enter a password!\n")
+        self.save_yaml(username,_password)
+        logging.info("Username and Password changed")
+        user_in = input("Run saved command?\t")
+        if user_in != "yes":
+            print("Okay, exiting\n")
+            sys.exit() 
+
+     '''
+    #   Description: Saves dictionary changes to yaml file    
+    #   Returns:     Nothing 
+    '''
+    def save_yaml(self,username,password): 
+        self.config_file["user"] = username
+        self.config_file["password"] = password
+        with open(self.yaml_loc, 'w') as f: 
+            yaml.dump(self.config_file,f)
         
 def main(argv):
     test = ssh_instance (argv)
+
 
 
 if __name__ == "__main__":
