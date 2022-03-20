@@ -14,20 +14,16 @@ class ssh_instance:
     def __init__(self, argv):
         logging.basicConfig(filename='../logging/ssh_script.log', format='%(asctime)s %(message)s',level=logging.DEBUG)
         #   To cut down on BS paramiko logs 
-        logging.getLogger("paramiko").setLevel(logging.WARNING)
-        if(len(sys.argv) > 1):
-            self.check_flags(argv)
         logging.debug("Opening Config File")
-        #ssh_instance.yaml_loc = "../ssh_config.yaml"
-        ssh_instance.config_file = open(self.yaml_loc,'r')
-        print(ssh_instance.config_file)
         #   grab config and return into a dictionary 
-        self.yaml_dict = self.get_config(self.config_file)  
+        ssh_instance.config_file = self.get_config()
+        print("printing config file\t\t")
+        print(ssh_instance.config_file)
+        logging.getLogger("paramiko").setLevel(logging.WARNING)
         if(len(sys.argv) > 1):
             self.check_flags(argv)
         #self.send_command(yaml_dict['host'], yaml_dict['user'], yaml_dict['password'])
 
-    
     '''
     #   Description: Sends bash command to machine via ssh 
     #   Returns:     Nothing 
@@ -53,8 +49,9 @@ class ssh_instance:
     #   Description: Retrieves credentials from yaml file  
     #   Returns:     Nothing 
     '''
-    def get_config(self, config):
+    def get_config(self):
         logger.info("Getting SSH credentials...")
+        config = open(self.yaml_loc,'r')
         _config = yaml.safe_load(config)
         print(_config)
         return _config
@@ -64,9 +61,13 @@ class ssh_instance:
     '''
     def check_flags(self, argv):
         if sys.argv[1] == "-c":
+            print(5)
             self.change_credentials()
+            print(6)
+            return 
         else: 
             logging.warn("Invalid flag, Aborting program")
+        print(7)
     '''
     #   Description: Changes SSH credentials   
     #   Returns:     Nothing 
@@ -75,22 +76,27 @@ class ssh_instance:
         logger.info("Time to change SSH Credentials")
         username = ""
         _password = ""
+        print(1)
         while len(username) == 0: 
             username = input("Enter Username\n")
             if len(username) == 0: 
                 print("Enter a username!\n")
         print("\n\n")
+        print(2)
         while len(_password) == 0: 
             _password = input("Enter Password\n")
             if len(_password) == 0: 
                 print("Enter a password!\n")
+        print(3)
         self.save_yaml(username,_password)
         #logging.info("Username and Password changed")
         
     def save_yaml(self,username,password): 
+        print(4)
+        #print("this is the old config " + self.config_file)
         self.config_file["user"] = username
         self.config_file["password"] = password
-        print(self.config_file)
+        #print(self.config_file)
         with open(self.yaml_loc, 'w') as f: 
             yaml.dump(self.config_file,f)
         
