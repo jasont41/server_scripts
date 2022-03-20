@@ -17,12 +17,12 @@ class ssh_instance:
         logging.debug("Opening Config File")
         #   grab config and return into a dictionary 
         ssh_instance.config_file = self.get_config()
-        print("printing config file\t\t")
-        print(ssh_instance.config_file)
+        # print("printing config file\t\t")
+        # print(ssh_instance.config_file)
         logging.getLogger("paramiko").setLevel(logging.WARNING)
         if(len(sys.argv) > 1):
             self.check_flags(argv)
-        #self.send_command(yaml_dict['host'], yaml_dict['user'], yaml_dict['password'])
+        self.send_command(self.config_file['hostname'], self.config_file['username'], self.config_file['password'])
 
     '''
     #   Description: Sends bash command to machine via ssh 
@@ -38,6 +38,7 @@ class ssh_instance:
             outline = stdout.readlines()
             resp = ''.join(outline)
             logging.debug(resp)
+            print(resp)
             ssh.close()
         except: 
             worked = False
@@ -61,13 +62,10 @@ class ssh_instance:
     '''
     def check_flags(self, argv):
         if sys.argv[1] == "-c":
-            print(5)
             self.change_credentials()
-            print(6)
             return 
         else: 
             logging.warn("Invalid flag, Aborting program")
-        print(7)
     '''
     #   Description: Changes SSH credentials   
     #   Returns:     Nothing 
@@ -76,27 +74,29 @@ class ssh_instance:
         logger.info("Time to change SSH Credentials")
         username = ""
         _password = ""
-        print(1)
         while len(username) == 0: 
             username = input("Enter Username\n")
             if len(username) == 0: 
                 print("Enter a username!\n")
-        print("\n\n")
-        print(2)
+        print("\n")
         while len(_password) == 0: 
             _password = input("Enter Password\n")
             if len(_password) == 0: 
                 print("Enter a password!\n")
-        print(3)
         self.save_yaml(username,_password)
-        #logging.info("Username and Password changed")
-        
+        logging.info("Username and Password changed")
+        user_in = input("Run saved command?\t")
+        if user_in != "yes":
+            print("Okay, exiting\n")
+            sys.exit() 
+
+     '''
+    #   Description: Saves dictionary changes to yaml file    
+    #   Returns:     Nothing 
+    '''
     def save_yaml(self,username,password): 
-        print(4)
-        #print("this is the old config " + self.config_file)
         self.config_file["user"] = username
         self.config_file["password"] = password
-        #print(self.config_file)
         with open(self.yaml_loc, 'w') as f: 
             yaml.dump(self.config_file,f)
         
