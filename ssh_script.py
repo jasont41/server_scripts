@@ -4,6 +4,7 @@ from distutils.command.config import config
 from genericpath import exists
 from os import lseek
 import paramiko as p
+from paramiko import HostKeys
 import yaml
 import sys 
 import logging 
@@ -65,8 +66,12 @@ class ssh_instance:
         if sys.argv[1] == "-c":
             self.change_credentials()
             return 
+        if sys.argv[1] == "-h":
+            self.change_hostname() 
+            return
         else: 
             logging.warn("Invalid flag, Aborting program")
+
     '''
     #   Description: Changes SSH credentials   
     #   Returns:     Nothing 
@@ -80,24 +85,41 @@ class ssh_instance:
             if len(username) == 0: 
                 print("Enter a username!\n")
         print("\n")
+        self.save_yaml("user",_password)
         while len(_password) == 0: 
-            _password = input("Enter Password\n")
+            _password = input("Enter Password: ")
             if len(_password) == 0: 
                 print("Enter a password!\n")
-        self.save_yaml(username,_password)
+        self.save_yaml("password",_password)
         logging.info("Username and Password changed")
         user_in = input("Run saved command?\t")
         if user_in != "yes":
             print("Okay, exiting\n")
             sys.exit() 
-
+    '''
+    #   Description: Changes host IP address  
+    #   Returns:     Nothing 
+    '''
+    def change_hostname(self): 
+        logging.info("Changing host IP address")
+        _host = ""
+        while len(_host) == 0: 
+            _host = input("Enter IP address: ")
+            if len(_host) == 0: 
+                print("Enter new IP address!")
+        self.save_yaml("hostname", _host)
+        logging.info("Changed hostanme")
+        user_in = input("Run saved command?\t")
+        if user_in != "yes":
+            print("Okay, exiting\n")
+            sys.exit() 
+        
     '''
     #   Description: Saves dictionary changes to yaml file    
     #   Returns:     Nothing 
     '''
-    def save_yaml(self,username,password): 
-        self.config_file["user"] = username
-        self.config_file["password"] = password
+    def save_yaml(self ,_key, _newVal): 
+        self.config_file[_key] = _newVal
         with open(self.yaml_loc, 'w') as f: 
             yaml.dump(self.config_file,f)
         
