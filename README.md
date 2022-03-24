@@ -8,5 +8,8 @@ This is a command line SSH application. I am building more to get more accustome
 <li>Using this flag with allow the user to retype their credentials into the config yaml</li>
 </ul>
 </li>
+<li>
+  -h <ul><li>Change hostname</li></ul>
+</li>
 
 </ul>
