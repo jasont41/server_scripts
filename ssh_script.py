@@ -34,7 +34,8 @@ class ssh_instance:
             ssh = p.SSHClient() 
             ssh.set_missing_host_key_policy(p.AutoAddPolicy())
             ssh.connect(host,22,username,password,timeout=5)
-            stdin, stdout, stderr = ssh.exec_command("df")
+            command = "ls; df -h"
+            stdin, stdout, stderr = ssh.exec_command(command)
             outline = stdout.readlines()
             resp = ''.join(outline)
             logging.debug(resp)
@@ -90,7 +91,7 @@ class ssh_instance:
             print("Okay, exiting\n")
             sys.exit() 
 
-     '''
+    '''
     #   Description: Saves dictionary changes to yaml file    
     #   Returns:     Nothing 
     '''
