@@ -138,7 +138,7 @@ class ssh_instance:
         yamlpass = self.config_file["password"] 
         _input = input("Enter your password\n")
         userpass = sha256(_input.encode('utf-8')).hexdigest()
-        if yamlpass != _input: 
+        if yamlpass != userpass: 
             logging.warning("Incorrect password, exiting\n")
             sys.exit()
     '''
