@@ -20,10 +20,10 @@ class ssh_instance:
         #   grab config and return into a dictionary 
         ssh_instance.config_file = self.get_config()
         #   check if password exists 
-        if "password" in self.config_file.keys(): 
-            self.check_password()
-        else: 
-            self.enter_password()
+        # if "password" in self.config_file.keys(): 
+        #     self.check_password()
+        # else: 
+        #     self.enter_password()
         logging.getLogger("paramiko").setLevel(logging.WARNING)
         if(len(sys.argv) > 1):
             self.check_flags(argv)
@@ -60,7 +60,7 @@ class ssh_instance:
         logger.info("Getting SSH credentials...")
         config = open(self.yaml_loc,'r')
         _config = yaml.safe_load(config)
-        print(_config)
+        #print(_config)
         return _config
     '''
     #   Description: Checks incoming flags and calls respective function 
@@ -76,8 +76,10 @@ class ssh_instance:
         if sys.argv[1] == "-t": #   for test
             print("testing for now... ")
             return
+        if sys.argv[1] == "--add_host":
+            self.add_host()
         else: 
-            logging.warn("Invalid flag, Aborting program")
+            logging.warning("Invalid flag, Aborting program")
 
     '''
     #   Description: Changes SSH credentials   
@@ -122,6 +124,18 @@ class ssh_instance:
             sys.exit() 
         
     '''
+    #   Description: Adds Host to yaml     
+    #   Returns:     Nothing 
+    '''
+    def add_host(self): 
+        logging.debug("Adding host")
+        _hostname = input("Enter nickname of host\n")
+        _user = input("Enter Username: \n")
+        _password = input("Enter password\n")
+        this_list = [_user, _password]
+        self.save_yaml("host_"+_hostname, this_list)
+
+    '''
     #   Description: Saves dictionary changes to yaml file    
     #   Returns:     Nothing 
     '''
@@ -134,27 +148,28 @@ class ssh_instance:
     #   Description: Checks if user entered password matches hashed password in yaml  
     #   Returns:     Nothing 
     '''
-    def check_password(self):
-        yamlpass = self.config_file["password"] 
-        _input = input("Enter your password\n")
-        userpass = sha256(_input.encode('utf-8')).hexdigest()
-        if yamlpass != userpass: 
-            logging.warning("Incorrect password, exiting\n")
-            sys.exit()
-    '''
-    #   Description: No password detected, user creates password 
-    #   Returns:     Nothing 
-    '''
-    def enter_password(self):
-        logging.info("No password found in config, let's create one now\n")
-        _input = input("Enter your password\n")
-        emp_str = ""
-        while emp_str != "yes" : 
-            emp_str = input("You entered.. " + _input + "\t Enter yes if that is your password.")
-            if emp_str != "yes": 
-                _input = input("Enter password\n")
-        new_pass = sha256(_input.encode('utf-8')).hexdigest()
-        self.save_yaml("password", new_pass)
+    #   Gonna wait on this 
+    # def check_password(self):
+    #     yamlpass = self.config_file["password"] 
+    #     _input = input("Enter your password\n")
+    #     userpass = sha256(_input.encode('utf-8')).hexdigest()
+    #     if yamlpass != userpass: 
+    #         logging.warning("Incorrect password, exiting\n")
+    #         sys.exit()
+    # '''
+    # #   Description: No password detected, user creates password 
+    # #   Returns:     Nothing 
+    # '''
+    # def enter_password(self):
+    #     logging.info("No password found in config, let's create one now\n")
+    #     _input = input("Enter your password\n")
+    #     emp_str = ""
+    #     while emp_str != "yes" : 
+    #         emp_str = input("You entered.. " + _input + "\t Enter yes if that is your password.")
+    #         if emp_str != "yes": 
+    #             _input = input("Enter password\n")
+    #     new_pass = sha256(_input.encode('utf-8')).hexdigest()
+    #     self.save_yaml("password", new_pass)
         
 def main(argv):
     test = ssh_instance (argv)
