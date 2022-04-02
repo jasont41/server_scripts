@@ -1,0 +1,20 @@
+SSH App Plan 
+
+General: 
+    - Logging to file 
+User Services: 
+    - Create profile 
+    - Profile credential change 
+    - Show commands/ hosts available to that user 
+    - One Yaml for profiles, one for each user 
+    - Hash profile passwords 
+SSH Services 
+    - Commands (Add/delete/edit)
+        * print lines similarly to display, edit line n then confirm if it is correct
+    - Give name to host -> default to IP 
+Display 
+    - Display messages by host name, i.e. 
+                192.168.X.X
+            1. ls 
+            2. cd Desktop/ 
+        * if more than one list message 1, 2 ... n [Hostname once]        

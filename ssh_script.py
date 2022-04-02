@@ -19,15 +19,19 @@ class ssh_instance:
         logging.debug("Opening Config File")
         #   grab config and return into a dictionary 
         ssh_instance.config_file = self.get_config()
+        print (ssh_instance.config_file)
+        print("\n")
+        profile_list = list(ssh_instance.config_file["profiles"].keys())
+        print(profile_list)
         #   check if password exists 
         # if "password" in self.config_file.keys(): 
         #     self.check_password()
         # else: 
         #     self.enter_password()
         logging.getLogger("paramiko").setLevel(logging.WARNING)
-        if(len(sys.argv) > 1):
-            self.check_flags(argv)
-        self.send_command(self.config_file['hostname'], self.config_file['username'], self.config_file['password'])
+        # if(len(sys.argv) > 1):
+        #     self.check_flags(argv)
+        #self.send_command(self.config_file['hostname'], self.config_file['username'], self.config_file['password'])
 
     '''
     #   Description: Sends bash command to machine via ssh 
@@ -67,16 +71,19 @@ class ssh_instance:
     #   Returns:     Nothing 
     '''
     def check_flags(self, argv):
-        if sys.argv[1] == "-c":
+        _argv = sys.argv[1]
+        if _argv == "-a": 
+            self.add_command()
+        if _argv == "-c":
             self.change_credentials()
             return 
-        if sys.argv[1] == "-h":
+        if _argv == "-h":
             self.change_hostname() 
             return
-        if sys.argv[1] == "-t": #   for test
+        if _argv == "-t": #   for test
             print("testing for now... ")
             return
-        if sys.argv[1] == "--add_host":
+        if _argv == "--add_host":
             self.add_host()
         else: 
             logging.warning("Invalid flag, Aborting program")
