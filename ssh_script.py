@@ -80,6 +80,7 @@ class ssh_instance:
         print("Logged in as " + _user)
         ssh_instance.current_user = _user 
 
+
     '''
     #   Description: Sends bash command to machine via ssh 
     #   Returns:     Nothing 
@@ -102,6 +103,7 @@ class ssh_instance:
             logger.warning("Error found, check credentials")
         if worked: 
             logger.info("SSH Command sent successfully")
+        
         
     '''
     #   Description: Retrieves credentials from yaml file  
@@ -188,6 +190,7 @@ class ssh_instance:
         this_list = [_user, _password]
         self.save_yaml("host_"+_hostname, this_list)
 
+
     '''
     #   Description: Saves dictionary changes to yaml file    
     #   Returns:     Nothing 
@@ -205,33 +208,6 @@ class ssh_instance:
     def terminal_clear(self):
         print(chr(27) + "[2J")
 
-
-    '''
-    #   Description: Checks if user entered password matches hashed password in yaml  
-    #   Returns:     Nothing 
-    '''
-    #   Gonna wait on this 
-    # def check_password(self):
-    #     yamlpass = self.config_file["password"] 
-    #     _input = input("Enter your password\n")
-    #     userpass = sha256(_input.encode('utf-8')).hexdigest()
-    #     if yamlpass != userpass: 
-    #         logging.warning("Incorrect password, exiting\n")
-    #         sys.exit()
-    # '''
-    # #   Description: No password detected, user creates password 
-    # #   Returns:     Nothing 
-    # '''
-    # def enter_password(self):
-    #     logging.info("No password found in config, let's create one now\n")
-    #     _input = input("Enter your password\n")
-    #     emp_str = ""
-    #     while emp_str != "yes" : 
-    #         emp_str = input("You entered.. " + _input + "\t Enter yes if that is your password.")
-    #         if emp_str != "yes": 
-    #             _input = input("Enter password\n")
-    #     new_pass = sha256(_input.encode('utf-8')).hexdigest()
-    #     self.save_yaml("password", new_pass)
         
 def main(argv):
     test = ssh_instance (argv)
