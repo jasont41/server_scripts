@@ -8,10 +8,12 @@ from paramiko import HostKeys
 import yaml
 import sys 
 import logging 
+import getpass
 from hashlib import sha256 #    For password hashing 
 
 class ssh_instance: 
     config_file = {}
+    current_user = None 
     yaml_loc = "../ssh_config.yaml"
     def __init__(self, argv):
         logging.basicConfig(filename='../logging/ssh_script.log', format='%(asctime)s %(message)s',level=logging.DEBUG)
@@ -19,19 +21,64 @@ class ssh_instance:
         logging.debug("Opening Config File")
         #   grab config and return into a dictionary 
         ssh_instance.config_file = self.get_config()
-        print (ssh_instance.config_file)
-        print("\n")
-        profile_list = list(ssh_instance.config_file["profiles"].keys())
-        print(profile_list)
-        #   check if password exists 
-        # if "password" in self.config_file.keys(): 
-        #     self.check_password()
-        # else: 
-        #     self.enter_password()
+        self.profile_auth()
         logging.getLogger("paramiko").setLevel(logging.WARNING)
         # if(len(sys.argv) > 1):
         #     self.check_flags(argv)
         #self.send_command(self.config_file['hostname'], self.config_file['username'], self.config_file['password'])
+
+    '''
+    #   Description: Profile auth
+    #   Returns:     Nothing 
+    '''
+    def profile_auth(self):
+        profile_list = []
+        _user = None
+        _password = None 
+        num = None 
+        empty = False 
+        try:
+            profile_list = list(ssh_instance.config_file["profiles"].keys())
+            num = len(profile_list)
+        except: 
+            empty = True 
+        if empty: 
+            print("Time to make an account!\n\n")
+            _input = None 
+            while _input != "y":
+                _user =  input ("Enter username: \t ")
+                _input = input ("Is " + _user + " correct?\t").lower()
+            _input = None
+            while _input != "y":
+                _password =  input ("Enter password: \t ")
+                _input = input ("Is " + _password + " correct?").lower()     
+            _password = sha256(_password.encode('utf-8')).hexdigest()
+            profiles = {_user:_password}
+            self.save_yaml("profiles", profiles)
+        elif (input("Create new profile? \t").lower() == "y"): 
+            print("Time to make an account!\n\n")
+            _input = None 
+            while _input != "y":
+                _user =  input ("Enter username: \t ")
+                _input = input ("Is " + _user + " correct?\t").lower()
+            _input = None
+            while _input != "y":
+                _password =  input ("Enter password: \t ")
+                _input = input ("Is " + _password + " correct?").lower()     
+            _password = sha256(_password.encode('utf-8')).hexdigest()
+            self.config_file["profiles"][_user] = _password
+            print(self.config_file)
+            self.save_yaml("profiles", self.config_file["profiles"])
+        else: 
+            print("\t\tProfiles saved:")
+            for profile in range(len(profile_list)):
+                print(str(profile+1) + ": " + profile_list[profile])
+            while (_user not in ssh_instance.config_file["profiles"].keys()):
+                _user = input("Enter:\t\t").lower()
+            while (_password != ssh_instance.config_file["profiles"][_user]):
+                _password = sha256(getpass.getpass("Password:\t").encode('utf-8')).hexdigest()
+        print("Logged in as " + _user)
+        ssh_instance.current_user = _user 
 
     '''
     #   Description: Sends bash command to machine via ssh 
@@ -64,7 +111,6 @@ class ssh_instance:
         logger.info("Getting SSH credentials...")
         config = open(self.yaml_loc,'r')
         _config = yaml.safe_load(config)
-        #print(_config)
         return _config
     '''
     #   Description: Checks incoming flags and calls respective function 
@@ -150,7 +196,16 @@ class ssh_instance:
         self.config_file[_key] = _newVal
         with open(self.yaml_loc, 'w') as f: 
             yaml.dump(self.config_file,f)
-    
+
+
+    '''
+    #   Description: Clears terminal     
+    #   Returns:     Nothing 
+    '''
+    def terminal_clear(self):
+        print(chr(27) + "[2J")
+
+
     '''
     #   Description: Checks if user entered password matches hashed password in yaml  
     #   Returns:     Nothing 
