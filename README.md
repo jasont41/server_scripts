@@ -13,3 +13,4 @@ This is a command line SSH application. I am building more to get more accustome
 </li>
 
 </ul>
+<h4>Yaml configs are labeled <\user>_profile.yaml and stored one directory up from the project folder </h4>

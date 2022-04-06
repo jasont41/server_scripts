@@ -10,6 +10,7 @@ import sys
 import logging 
 import getpass
 from hashlib import sha256 #    For password hashing 
+import profile_page
 
 class ssh_instance: 
     config_file = {}
@@ -22,6 +23,7 @@ class ssh_instance:
         #   grab config and return into a dictionary 
         ssh_instance.config_file = self.get_config()
         self.profile_auth()
+        user_session = profile_page.profile(self.current_user)
         logging.getLogger("paramiko").setLevel(logging.WARNING)
         # if(len(sys.argv) > 1):
         #     self.check_flags(argv)
@@ -53,7 +55,7 @@ class ssh_instance:
                 _password =  input ("Enter password: \t ")
                 _input = input ("Is " + _password + " correct?").lower()     
             _password = sha256(_password.encode('utf-8')).hexdigest()
-            profiles = {_user:_password}
+            profiles = {_user.strip():_password}
             self.save_yaml("profiles", profiles)
         elif (input("Create new profile? \t").lower() == "y"): 
             print("Time to make an account!\n\n")
@@ -66,7 +68,7 @@ class ssh_instance:
                 _password =  input ("Enter password: \t ")
                 _input = input ("Is " + _password + " correct?").lower()     
             _password = sha256(_password.encode('utf-8')).hexdigest()
-            self.config_file["profiles"][_user] = _password
+            self.config_file["profiles"][_user.strip()] = _password
             print(self.config_file)
             self.save_yaml("profiles", self.config_file["profiles"])
         else: 
@@ -74,8 +76,8 @@ class ssh_instance:
             for profile in range(len(profile_list)):
                 print(str(profile+1) + ": " + profile_list[profile])
             while (_user not in ssh_instance.config_file["profiles"].keys()):
-                _user = input("Enter:\t\t").lower()
-            while (_password != ssh_instance.config_file["profiles"][_user]):
+                _user = input("Enter Username \t\t").lower()
+            while (_password != ssh_instance.config_file["profiles"][_user.strip()]):
                 _password = sha256(getpass.getpass("Password:\t").encode('utf-8')).hexdigest()
         print("Logged in as " + _user)
         ssh_instance.current_user = _user 
