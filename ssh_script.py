@@ -96,16 +96,9 @@ class ssh_instance:
         logger.info("Time to change SSH Credentials")
         username = ""
         _password = ""
-        while len(username) == 0: 
-            username = input("Enter Username\n")
-            if len(username) == 0: 
-                print("Enter a username!\n")
-        print("\n")
+        self.check_user_input(username)
         self.save_yaml("user",_password)
-        while len(_password) == 0: 
-            _password = input("Enter Password: ")
-            if len(_password) == 0: 
-                print("Enter a password!\n ")
+        self.check_user_input(_password)
         self.save_yaml("password",_password)
         logging.info("Username and Password changed")
         user_in = input("Run saved command?\t")
@@ -119,10 +112,7 @@ class ssh_instance:
     def change_hostname(self): 
         logging.info("Changing host IP address")
         _host = ""
-        while len(_host) == 0: 
-            _host = input("Enter IP address: ")
-            if len(_host) == 0: 
-                print("Enter new IP address!")
+        self.check_user_input(_host)
         self.save_yaml("hostname", _host)
         logging.info("Changed hostanme")
         user_in = input("Run saved command?\t")
@@ -151,6 +141,11 @@ class ssh_instance:
         with open(self.yaml_loc, 'w') as f: 
             yaml.dump(self.config_file,f)
     
+    def check_user_input(self,value): 
+        while len(value) == 0: 
+            _value = input("Enter IP address: ")
+            if len(value) == 0: 
+                print("Enter new IP address!")
     '''
     #   Description: Checks if user entered password matches hashed password in yaml  
     #   Returns:     Nothing 
