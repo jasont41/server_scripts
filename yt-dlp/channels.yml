@@ -1,0 +1,8 @@
+shortcircuit:
+  name: Short Circuit
+  numOfVideos: 405
+  path: Path/to/directory 
+  url: https://www.youtube.com/c/ShortCircuit/videos
+  history_txt: /path/to/archive.txt
+  abbv: SC
+
